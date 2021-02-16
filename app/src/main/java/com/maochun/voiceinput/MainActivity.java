@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -15,6 +16,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -92,6 +94,17 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private View.OnFocusChangeListener mViewFocusChangeListener = new View.OnFocusChangeListener(){
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+
+            if (!hasFocus) {
+                hideKeyboard(v);
+
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +120,11 @@ public class MainActivity extends AppCompatActivity {
         mLengthEditText = findViewById(R.id.editTextLength);
         mWidthEditText = findViewById(R.id.editTextWidth);
         mHeightEditText = findViewById(R.id.editTextTextHeight);
+
+        mLengthEditText.setOnFocusChangeListener(mViewFocusChangeListener);
+        mWidthEditText.setOnFocusChangeListener(mViewFocusChangeListener);
+        mHeightEditText.setOnFocusChangeListener(mViewFocusChangeListener);
+
 
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mSpeechRecognizer.setRecognitionListener(mRecognitionListener);
@@ -124,6 +142,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mSpeechRecognizer.destroy();
+    }
+
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     public void onVoiceInputButtonClick(View v){
